@@ -13,6 +13,26 @@ services:
       - "80:80"
       - "443:443"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks: 
+      - net
+
+  api: 
+    image: kaymantex68/cayman-backend
+    container_name: api
+    environment: 
+    #     - DATABASE='mongodb+srv://Brandon:311774@cluster0.7t3kp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+    #     - PORT=8000
+      - URI_BRAND_PICTURE=/usr/scr/app/images/brand
+      - URI_PRODUCT_PICTURE=/usr/scr/app/images/product
+      - URI_SLIDER_PICTURE=/usr/scr/app/images/slider
+      - URI_DILER_PICTURE=/usr/scr/app/images/diler
+    volumes: 
+      - ./public/images/:/usr/scr/app/images
+    ports: 
+      - 8000:8000
+    networks: 
+      - net
+
   certbot:
     image: certbot/certbot
     restart: unless-stopped
@@ -20,3 +40,9 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks: 
+      - net
+
+networks: 
+  net:
+    driver: bridge
